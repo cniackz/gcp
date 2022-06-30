@@ -1,0 +1,20 @@
+#!/bin/bash
+FILE=/home/ec2-user/result.log
+
+echo "Install MinIO and mc" |& tee -a $FILE
+wget https://dl.min.io/server/minio/release/linux-arm64/minio
+wget https://dl.min.io/client/mc/release/linux-arm64/mc
+chmod +x minio
+chmod +x mc
+mv minio /usr/bin/minio
+mv mc /usr/bin/mc
+MINIO_ROOT_USER=admin
+MINIO_ROOT_PASSWORD=password
+
+echo "Expose hosts" |& tee -a $FILE
+touch /home/ec2-user/hosts
+chmod 666 /home/ec2-user/hosts
+rm -f /etc/hosts
+ln -f /home/ec2-user/hosts /etc/hosts # symbolic does not work.
+
+echo "End of the Script" |& tee -a $FILE

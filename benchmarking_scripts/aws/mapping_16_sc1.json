@@ -1,0 +1,130 @@
+[
+	{
+		"DeviceName": "/dev/sdb",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdc",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdd",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sde",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdf",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdg",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdh",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdi",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdj",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdk",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdl",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdm",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdn",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdo",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdp",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	},
+	{
+		"DeviceName": "/dev/sdq",
+		"Ebs": {
+			"VolumeSize": 16384,
+			"DeleteOnTermination": true,
+			"VolumeType": "sc1"
+		}
+	}
+]

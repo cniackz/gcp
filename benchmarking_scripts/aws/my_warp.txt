@@ -1,0 +1,19 @@
+#!/bin/bash
+FILE=/home/ec2-user/result.log
+
+echo "Expose hosts" |& tee -a $FILE
+touch /home/ec2-user/hosts
+chmod 666 /home/ec2-user/hosts
+rm -f /etc/hosts
+ln -f /home/ec2-user/hosts /etc/hosts # symbolic does not work.
+
+echo "Installing WARP" |& tee -a $FILE
+wget https://github.com/minio/warp/releases/download/v0.5.5/warp_0.5.5_Linux_arm64.tar.gz
+tar -xzvf warp_0.5.5_Linux_arm64.tar.gz
+chmod +x warp
+mv warp /usr/bin/warp
+WARP_ACCESS_KEY=minioadmin
+WARP_SECRET_KEY=minioadmin
+
+echo "Executing the warp client" |& tee -a $FILE
+warp client |& tee -a $FILE

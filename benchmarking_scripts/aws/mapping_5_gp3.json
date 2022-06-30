@@ -1,0 +1,52 @@
+[
+	{
+		"DeviceName": "/dev/sdb",
+		"Ebs": {
+			"VolumeSize": 1024,
+			"DeleteOnTermination": true,
+			"VolumeType": "gp3",
+			"Throughput": 1000,
+			"Iops": 16000
+		}
+	},
+	{
+		"DeviceName": "/dev/sdc",
+		"Ebs": {
+			"VolumeSize": 1024,
+			"DeleteOnTermination": true,
+			"VolumeType": "gp3",
+			"Throughput": 1000,
+			"Iops": 16000
+		}
+	},
+	{
+		"DeviceName": "/dev/sdd",
+		"Ebs": {
+			"VolumeSize": 1024,
+			"DeleteOnTermination": true,
+			"VolumeType": "gp3",
+			"Throughput": 1000,
+			"Iops": 16000
+		}
+	},
+	{
+		"DeviceName": "/dev/sde",
+		"Ebs": {
+			"VolumeSize": 1024,
+			"DeleteOnTermination": true,
+			"VolumeType": "gp3",
+			"Throughput": 1000,
+			"Iops": 16000
+		}
+	},
+	{
+		"DeviceName": "/dev/sdf",
+		"Ebs": {
+			"VolumeSize": 1024,
+			"DeleteOnTermination": true,
+			"VolumeType": "gp3",
+			"Throughput": 1000,
+			"Iops": 16000
+		}
+	}
+]
