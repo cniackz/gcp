@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-source ../common.sh
+source common.sh
 
 # TEST_4_NODES
 NUMBER_OF_NODES=4
