@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 #
 # File: benchmark_gcp_test.sh
 #
@@ -9,15 +9,29 @@
 
 source common.sh
 
+PROJECT_ID=daring-bit-354216 
+TEST_NETWORK=test-network
+TEST_SUBNET=test-subnetwork
+REGION=us-south1
+ZONE=us-south1-a
+TAG_KEY=
+NAME_PREFIX=min
+NAME_SUFFIX_START_NUMBER=1
+DISK_NAME_PREFIX=disk 
+DISK_SUFFIX_START_NUMBER=1
+DISK_SIZE=10GB
+DISK_TYPE=pd-ssd
+DISK_DEVICE_NAMES=(sdb sdc sdd sde sdf sdg sdh sdi sdj sdk sdl sdm)
+DISK_MOUNT_POINTS=(disk1 disk2 disk3 disk4 disk5 disk6 disk7 disk8 disk9 disk10 disk11 disk12)
+
+
+
 # TEST_4_NODES
-NUMBER_OF_NODES=4
-NUMBER_OF_DISKS=4
-INSTANCES=()
-INSTANCE_TYPE=e2-medium
-AMI=ami-0b6705f88b1f688c1 # (64-bit Arm)
+NUMBER_OF_NODES=1
+NUMBER_OF_DISKS=12
+MACHINE_TYPE=e2-standard-4 
 TAG_KEY=test
 ETC_HOSTS=
-SECURITY_GROUP=sg-00fcb6381a1a6bf02
 KEY_PAIRS=TESTING
 COMMAND_RESULT=
 SPEEDTEST_RESULT=
@@ -79,7 +93,6 @@ create_instances
 # Step 1
 #create_gcp_instance 1
 
-
 # Step 5
 #run_minio_distributed_in_gcp_instances 5
 
@@ -94,4 +107,11 @@ create_instances
 
 # Step 9
 #kill_previous_gcp_instance 9
+
+
+
+#remove_project_filewall_rules
+
+
+#remove_test_network
 

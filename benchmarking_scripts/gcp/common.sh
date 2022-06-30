@@ -4,8 +4,8 @@
 # Translated AWS common functions to GCP idioms
 #
 
-# Translated functions
 
+# Not changed
 function get_date_time(){
 	hour=$(date +"%H")
 	minute=$(date +"%M")
@@ -16,6 +16,7 @@ function get_date_time(){
 	echo $date_time
 }
 
+# Not changed
 function printHeader() {
 	echo ""
 	echo ""
@@ -23,7 +24,7 @@ function printHeader() {
 	echo "$1. $2"
 }
 
-
+# Remove GCP project's firewall rules so that we can remove VPCs
 function remove_project_filewall_rules() {
 	# Remove firewall rules
 	for firewall_rule in $(gcloud compute firewall-rules list --format="table[no-heading](name)")
@@ -33,11 +34,13 @@ function remove_project_filewall_rules() {
 	echo "Removed firewall rules from project $PROJECT_ID"
 }
 
+# Remove the "default" VPC that is created automatically when GCP projects are created
 function remove_default_network() {
 	gcloud compute networks delete default -q --verbosity=critical
 	echo "Removed default network from project $PROJECT_ID"
 }
 
+# Remove the custom testing VPC and its subnet
 function remove_test_network() {
 	gcloud compute networks subnets delete $TEST_SUBNET -q --verbosity=critical
 	gcloud compute networks delete $TEST_NETWORK -q --verbosity=critical
@@ -46,6 +49,7 @@ function remove_test_network() {
 }
 
 
+# Create a custom VPC network and subnetwork for testing
 function create_test_network() {
 	gcloud compute networks create $TEST_NETWORK \
 		--project=$PROJECT_ID \
@@ -69,6 +73,7 @@ function create_test_network() {
 }
 
 
+# Create minimal set of Project firewall rules to run the tests
 function create_firewall_rules() {
 	gcloud compute firewall-rules create allow-ssh \
 		--project=$PROJECT_ID  \
@@ -78,32 +83,6 @@ function create_firewall_rules() {
 		--action=ALLOW \
 		--rules=tcp:22 \
 		--source-ranges=0.0.0.0/0
-}
-
-
-# Parameters:
-#  1: instance identifier
-function create_instance() {
-
-	gcloud beta compute instances create $1 \
-		--project=$PROJECT_ID \
-		--zone=us-south1-a \
-		--machine-type=$MACHINE_TYPE \
-		--network-interface=network-tier=PREMIUM,subnet=$TEST_SUBNET \
-		--metadata=startup-script=echo\ \"foo\"$'\n' \
-		--maintenance-policy=MIGRATE \
-		--provisioning-model=STANDARD \
-		--service-account=580716829629-compute@developer.gserviceaccount.com \
-		--scopes=https://www.googleapis.com/auth/cloud-platform \
-		--create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/debian-cloud/global/images/debian-11-bullseye-v20220621,mode=rw,size=10,type=projects/$PROJECT_ID/zones/us-central1-a/diskTypes/pd-balanced \
-		--create-disk=device-name=data-disk-1,mode=rw,name=data-disk-1,size=100,type=projects/$PROJECT_ID/zones/us-south1-a/diskTypes/pd-ssd \
-		--no-shielded-secure-boot \
-		--shielded-vtpm \
-		--shielded-integrity-monitoring \
-		--reservation-affinity=any \
-		--threads-per-core=1 \
-		--visible-core-count=1
-	echo "Created VM $1"
 }
 
 
@@ -123,11 +102,6 @@ function delete_instance() {
 function run_command_on_an_instance() {
 	gcloud compute ssh "$1" --command='$2'
 }
-
-
-
-
-# NOTHING PAST THIS POINT WORKS
 
 
 function create_instances() {
@@ -174,8 +148,16 @@ function create_instances() {
   		--device-name="sd""$diskcounter" \
   		-q --verbosity=critical
 
+	# Now that disks are created and attached, we need to mount for format them
+
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/${DISK_DEVICE_NAMES[j]}"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mkdir -p /mnt/disks/${DISK_MOUNT_POINTS[j]}"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mount -o discard,defaults /dev/${DISK_DEVICE_NAMES[j]} /mnt/disks/${DISK_MOUNT_POINTS[j]}"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo chmod a+w /mnt/disks/${DISK_MOUNT_POINTS[j]}"
+
     diskcounter=$(( $diskcounter + 1 ))
 	done
+
 
     vmcounter=$(( $vmcounter + 1 ))
 	done
