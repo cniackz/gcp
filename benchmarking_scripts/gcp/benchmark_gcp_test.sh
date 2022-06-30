@@ -30,7 +30,14 @@ SPEEDTEST_RESULT=
 
 # Step 0
 kill_previous_gcp_instance 0
+# Remove firewall rules to eliminate network dependencies so we can remove VPCs
+remove_project_filewall_rules
 
+# Remove the default network in case it still exists
+remove_default_network
+
+# Remove the custom VPC created for testing
+remove_test_network
 # Step 1
 create_gcp_instance 1
 
