@@ -4,7 +4,6 @@
 # Translated AWS common functions to GCP idioms
 #
 
-
 # Not changed
 function get_date_time(){
 	hour=$(date +"%H")
@@ -48,7 +47,6 @@ function remove_test_network() {
 
 }
 
-
 # Create a custom VPC network and subnetwork for testing
 function create_test_network() {
 	gcloud compute networks create $TEST_NETWORK \
@@ -59,8 +57,6 @@ function create_test_network() {
 		--bgp-routing-mode=regional \
 		-q --verbosity=critical
 	echo "Created network $TEST_NETWORK in project $PROJECT_ID"
-
-
 	gcloud compute networks subnets create $TEST_SUBNET \
 		--project=$PROJECT_ID \
 		--description=Min.io\ performance\ testing\ subnetwork \
@@ -72,19 +68,31 @@ function create_test_network() {
 	echo "Created subnetwork $TEST_SUBNET in project $PROJECT_ID"
 }
 
-
 # Create minimal set of Project firewall rules to run the tests
 function create_firewall_rules() {
 	gcloud compute firewall-rules create allow-ssh \
-		--project=$PROJECT_ID  \
+		--project=$PROJECT_ID \
 		--direction=INGRESS \
 		--priority=1000 \
 		--network=$TEST_NETWORK \
 		--action=ALLOW \
 		--rules=tcp:22 \
 		--source-ranges=0.0.0.0/0
+	# Gcloud instance should ping another one
+	# https://stackoverflow.com/questions/36918142/gcloud-instance-cant-ping-another-one
+	gcloud compute firewall-rules create allow-icmp \
+		--network=$TEST_NETWORK \
+		--allow icmp
+	# MinIO Server Requires Communication
+	gcloud compute \
+		--project=minio-benchmarking firewall-rules create allow-traffic \
+		--description=allow-traffic \
+		--direction=INGRESS \
+		--priority=1000 \
+		--network=$TEST_NETWORK \
+		--action=ALLOW \
+		--rules=all
 }
-
 
 # Parameters:
 #  1: instance identifier
@@ -93,16 +101,12 @@ function delete_instance() {
 	echo "Deleted VM $1"
 }
 
-
-
-# This is an example invocation 
-
+# This is an example invocation
 # Parameter #1 is instance ID
 # Parameter #2 is command
 function run_command_on_an_instance() {
 	gcloud compute ssh "$1" --command='$2'
 }
-
 
 function create_instances() {
 	# Helper function for the PHASE 1 where we create new instances
@@ -111,16 +115,16 @@ function create_instances() {
 	for((i=0;i<$NUMBER_OF_NODES; i++))
 	do
     
-    # Create instance with its boot disk
+	echo "Create instance with its boot disk"
 	gcloud beta compute instances create "$NAME_PREFIX"-"$vmcounter" \
 		--project=$PROJECT_ID \
-		--zone=us-south1-a \
+		--zone=$ZONE \
 		--machine-type=$MACHINE_TYPE \
 		--network-interface=network-tier=PREMIUM,subnet=$TEST_SUBNET \
 		--metadata=startup-script=echo\ \"foo\"$'\n' \
 		--maintenance-policy=MIGRATE \
 		--provisioning-model=STANDARD \
-		--service-account=580716829629-compute@developer.gserviceaccount.com \
+		--service-account=$SERVICE_ACCOUNT \
 		--scopes=https://www.googleapis.com/auth/cloud-platform \
 		--create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/debian-cloud/global/images/debian-11-bullseye-v20220621,mode=rw,size=10,type=projects/$PROJECT_ID/zones/us-central1-a/diskTypes/pd-balanced \
 		--no-shielded-secure-boot \
@@ -131,38 +135,34 @@ function create_instances() {
 		--visible-core-count=1 \
 		-q --verbosity=critical 
 
-    # Create data disks
-    diskcounter=$DISK_SUFFIX_START_NUMBER
+	echo "Create data disks"
+	diskcounter=$DISK_SUFFIX_START_NUMBER
 	for((j=0;j<$NUMBER_OF_DISKS; j++))
 	do
-	# Create disk
+	echo "Create disk"
 	gcloud compute disks create "$DISK_NAME_PREFIX"-"$vmcounter"-"$diskcounter" \
-  		--size $DISK_SIZE \
-  		--type https://www.googleapis.com/compute/v1/projects/$PROJECT_ID/zones/$ZONE/diskTypes/$DISK_TYPE \
-  		-q --verbosity=critical
+		--zone=$ZONE \
+		--size $DISK_SIZE \
+		--type https://www.googleapis.com/compute/v1/projects/$PROJECT_ID/zones/$ZONE/diskTypes/$DISK_TYPE \
+		-q --verbosity=critical
 
-	# Attach disk
+	echo "Attach disk"
 	gcloud compute instances attach-disk "$NAME_PREFIX"-"$vmcounter" \
-  		--disk "$DISK_NAME_PREFIX"-"$vmcounter"-"$diskcounter" \
-  		--zone $ZONE \
-  		--device-name="sd""$diskcounter" \
-  		-q --verbosity=critical
+		--disk "$DISK_NAME_PREFIX"-"$vmcounter"-"$diskcounter" \
+		--zone $ZONE \
+		--device-name="sd""$diskcounter" \
+		-q --verbosity=critical
 
 	# Now that disks are created and attached, we need to mount for format them
-
+	sleep 20 # Sometimes, the first disk fails, I have the theory that if we wait some time, then all disks will work below commands:
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/${DISK_DEVICE_NAMES[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mkdir -p /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mount -o discard,defaults /dev/${DISK_DEVICE_NAMES[j]} /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo chmod a+w /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 
-    diskcounter=$(( $diskcounter + 1 ))
+	diskcounter=$(( $diskcounter + 1 ))
 	done
 
-
-    vmcounter=$(( $vmcounter + 1 ))
+	vmcounter=$(( $vmcounter + 1 ))
 	done
 }
-
-
-
-
