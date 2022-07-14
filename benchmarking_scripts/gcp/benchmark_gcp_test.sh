@@ -77,21 +77,6 @@ KEY_PAIRS=TESTING
 COMMAND_RESULT=
 SPEEDTEST_RESULT=
 
-# TEST_8_NODES
-# NUMBER_OF_NODES=8
-# NUMBER_OF_DISKS=4
-# INSTANCES=()
-# INSTANCE_TYPE=n2-highcpu-96
-# AMI=ami-0b6705f88b1f688c1 # (64-bit Arm)
-# TAG_KEY=test
-# ETC_HOSTS=
-# SECURITY_GROUP=sg-00fcb6381a1a6bf02
-# KEY_PAIRS=TESTING
-# COMMAND_RESULT=
-# SPEEDTEST_RESULT=
-
-
-
 # (rsk: 2022-06-30) 
 #  A full cleanup of potential left over resources in GCP is left as an enhancement. 
 #  For now we will presume the script runs to completion
