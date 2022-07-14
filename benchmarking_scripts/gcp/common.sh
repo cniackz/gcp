@@ -84,8 +84,8 @@ function create_firewall_rules() {
 		--network=$TEST_NETWORK \
 		--allow icmp
 	# MinIO Server Requires Communication
-	gcloud compute \
-		--project=minio-benchmarking firewall-rules create allow-traffic \
+	gcloud compute firewall-rules create allow-traffic \
+		--project=$PROJECT_ID \
 		--description=allow-traffic \
 		--direction=INGRESS \
 		--priority=1000 \
@@ -150,7 +150,6 @@ function create_instances() {
 	gcloud compute instances attach-disk "$NAME_PREFIX"-"$vmcounter" \
 		--disk "$DISK_NAME_PREFIX"-"$vmcounter"-"$diskcounter" \
 		--zone $ZONE \
-		--device-name="sd""$diskcounter" \
 		-q --verbosity=critical
 
 	# Now that disks are created and attached, we need to mount for format them
@@ -165,4 +164,20 @@ function create_instances() {
 
 	vmcounter=$(( $vmcounter + 1 ))
 	done
+}
+
+# Deletes all VMs in a Project
+function delete_instances() {
+	for vm in $(gcloud compute instances  list --format="table[no-heading](name)")
+	do
+		gcloud compute instances delete ${vm} -q --verbosity=critical
+	done	
+}
+
+# Removes all disks in Project
+function delete_disks() {
+	for disk in $(gcloud compute disks  list --format="table[no-heading](name)")
+	do
+		gcloud compute disks delete ${disk} -q --verbosity=critical
+	done	
 }
