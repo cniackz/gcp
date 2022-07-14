@@ -150,7 +150,6 @@ function create_instances() {
 	gcloud compute instances attach-disk "$NAME_PREFIX"-"$vmcounter" \
 		--disk "$DISK_NAME_PREFIX"-"$vmcounter"-"$diskcounter" \
 		--zone $ZONE \
-		--device-name="sd""$diskcounter" \
 		-q --verbosity=critical
 
 	# Now that disks are created and attached, we need to mount for format them
