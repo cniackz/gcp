@@ -8,5 +8,5 @@ sudo chmod +x minio
 sudo chmod +x mc
 sudo mv minio /usr/local/bin/minio
 sudo mv mc /usr/local/bin/mc
-sudo minio server http://host{1...4}/disk{1...4} &
+sudo minio server http://min-{1...4}/mnt/disks/disk{1...4} &
 echo "end"
