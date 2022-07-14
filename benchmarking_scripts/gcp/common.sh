@@ -165,3 +165,19 @@ function create_instances() {
 	vmcounter=$(( $vmcounter + 1 ))
 	done
 }
+
+# Deletes all VMs in a Project
+function delete_instances() {
+	for vm in $(gcloud compute instances  list --format="table[no-heading](name)")
+	do
+		gcloud compute instances delete ${vm} -q --verbosity=critical
+	done	
+}
+
+# Removes all disks in Project
+function delete_disks() {
+	for disk in $(gcloud compute disks  list --format="table[no-heading](name)")
+	do
+		gcloud compute disks delete ${disk} -q --verbosity=critical
+	done	
+}
