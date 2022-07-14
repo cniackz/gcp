@@ -153,7 +153,7 @@ function create_instances() {
 		-q --verbosity=critical
 
 	# Now that disks are created and attached, we need to mount for format them
-	sleep 20 # Sometimes, the first disk fails, I have the theory that if we wait some time, then all disks will work below commands:
+	sleep 5 # Sometimes, the first disk fails, I have the theory that if we wait some time, then all disks will work below commands:
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/${DISK_DEVICE_NAMES[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mkdir -p /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mount -o discard,defaults /dev/${DISK_DEVICE_NAMES[j]} /mnt/disks/${DISK_MOUNT_POINTS[j]}"
