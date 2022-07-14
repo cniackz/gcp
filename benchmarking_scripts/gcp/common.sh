@@ -84,8 +84,8 @@ function create_firewall_rules() {
 		--network=$TEST_NETWORK \
 		--allow icmp
 	# MinIO Server Requires Communication
-	gcloud compute \
-		--project=minio-benchmarking firewall-rules create allow-traffic \
+	gcloud compute firewall-rules create allow-traffic \
+		--project=$PROJECT_ID \
 		--description=allow-traffic \
 		--direction=INGRESS \
 		--priority=1000 \
