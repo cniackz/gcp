@@ -133,8 +133,15 @@ function create_instances() {
 		--reservation-affinity=any \
 		--threads-per-core=2 \
 		--visible-core-count=1 \
-		-q --verbosity=critical 
+		-q --verbosity=critical
 
+	# Wait for the SSHD service to start on the remote VM
+
+	sleep 10
+
+    # Capture /etc/fstab from current VM
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="cat /etc/fstab" > fstab
+    
 	echo "Create data disks"
 	diskcounter=$DISK_SUFFIX_START_NUMBER
 	for((j=0;j<$NUMBER_OF_DISKS; j++))
@@ -159,8 +166,31 @@ function create_instances() {
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mount -o discard,defaults /dev/${DISK_DEVICE_NAMES[j]} /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo chmod a+w /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 
+	echo "/dev/${DISK_DEVICE_NAMES[j]}  /mnt/disks/${DISK_MOUNT_POINTS[j]}   ext4   defaults  0 0" >> fstab
+
 	diskcounter=$(( $diskcounter + 1 ))
 	done
+
+		# Install /etc/fstab
+    gcloud compute scp fstab "$NAME_PREFIX"-"$vmcounter":~/fstab
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mv ~/fstab /etc/fstab"
+
+	# Minio server configuration file
+cat << _end_of_text > minio
+MINIO_VOLUMES="http://min-{1...${NUMBER_OF_NODES}}/mnt/disks/disk{1...${NUMBER_OF_DISKS}}"
+MINIO_OPTS="--console-address :9001"
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+MINIO_SERVER_URL="http://localhost:9000"
+_end_of_text
+
+	# Install min.io server software
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo apt-get update"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo apt install wget"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio_20220715034422.0.0_amd64.deb -O minio.deb"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo dpkg -i minio.deb"
+    gcloud compute scp minio "$NAME_PREFIX"-"$vmcounter":~/minio
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mv ~/minio /etc/default/minio"
 
 	vmcounter=$(( $vmcounter + 1 ))
 	done
