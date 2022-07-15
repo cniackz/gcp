@@ -141,6 +141,8 @@ function create_instances() {
 
     # Capture /etc/fstab from current VM
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="cat /etc/fstab" > fstab
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo groupadd -r minio-user"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo useradd -M -r -g minio-user minio-user"
     
 	echo "Create data disks"
 	diskcounter=$DISK_SUFFIX_START_NUMBER
@@ -165,6 +167,7 @@ function create_instances() {
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mkdir -p /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mount -o discard,defaults /dev/${DISK_DEVICE_NAMES[j]} /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo chmod a+w /mnt/disks/${DISK_MOUNT_POINTS[j]}"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo chown minio-user:minio-user /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 
 	echo "/dev/${DISK_DEVICE_NAMES[j]}  /mnt/disks/${DISK_MOUNT_POINTS[j]}   ext4   defaults  0 0" >> fstab
 
@@ -201,7 +204,7 @@ function delete_instances() {
 	for vm in $(gcloud compute instances  list --format="table[no-heading](name)")
 	do
 		gcloud compute instances delete ${vm} -q --verbosity=critical
-	done	
+	done
 }
 
 # Removes all disks in Project
