@@ -172,8 +172,26 @@ function create_instances() {
 	diskcounter=$(( $diskcounter + 1 ))
 	done
 
+	# Install /etc/fstab
     gcloud compute scp fstab "$NAME_PREFIX"-"$vmcounter":~/fstab
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mv ~/fstab /etc/fstab"
+
+	# Minio server configuration file
+cat << _end_of_text > minio
+MINIO_VOLUMES="http://min-{1...${NUMBER_OF_NODES}}/mnt/disks/disk{1...${NUMBER_OF_DISKS}}"
+MINIO_OPTS="--console-address :9001"
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+MINIO_SERVER_URL="http://localhost:9000"
+_end_of_text
+
+	# Install min.io server software
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo apt-get update"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo apt install wget"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio_20220715034422.0.0_amd64.deb -O minio.deb"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo dpkg -i minio.deb"
+    gcloud compute scp minio "$NAME_PREFIX"-"$vmcounter":~/minio
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mv ~/minio /etc/default/minio"
 
 	vmcounter=$(( $vmcounter + 1 ))
 	done
