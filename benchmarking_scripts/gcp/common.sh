@@ -135,6 +135,14 @@ function create_instances() {
 		--visible-core-count=1 \
 		-q --verbosity=critical 
 
+	# Wait for the SSHD service to start on the remote VM
+
+	sleep 10
+
+    # Capture /etc/fstab from current VM
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="cat /etc/fstab" > fstab
+    
+
 	echo "Create data disks"
 	diskcounter=$DISK_SUFFIX_START_NUMBER
 	for((j=0;j<$NUMBER_OF_DISKS; j++))
@@ -159,11 +167,18 @@ function create_instances() {
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mount -o discard,defaults /dev/${DISK_DEVICE_NAMES[j]} /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo chmod a+w /mnt/disks/${DISK_MOUNT_POINTS[j]}"
 
+	echo "/dev/${DISK_DEVICE_NAMES[j]}  /mnt/disks/${DISK_MOUNT_POINTS[j]}   ext4   defaults  0 0" >> fstab
+
 	diskcounter=$(( $diskcounter + 1 ))
 	done
 
+    gcloud compute scp fstab "$NAME_PREFIX"-"$vmcounter":~/fstab
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mv ~/fstab /etc/fstab"
+
 	vmcounter=$(( $vmcounter + 1 ))
 	done
+
+	echo fstab
 }
 
 # Deletes all VMs in a Project
