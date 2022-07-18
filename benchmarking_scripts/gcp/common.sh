@@ -202,6 +202,12 @@ _end_of_text
 	vmcounter=$(( $vmcounter + 1 ))
 	done
 
+	# Now we go back and start minio service on each VM
+	echo 'Starting minio service on each VM'
+	vmcounter=$NAME_SUFFIX_START_NUMBER
+	for((i=0;i<$NUMBER_OF_NODES; i++))
+	do
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo systemctl start minio.service"
 	vmcounter=$(( $vmcounter + 1 ))
 	done
 }
