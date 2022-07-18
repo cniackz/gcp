@@ -182,8 +182,8 @@ function create_instances() {
 cat << _end_of_text > minio
 MINIO_VOLUMES="http://min-{1...${NUMBER_OF_NODES}}/mnt/disks/disk{1...${NUMBER_OF_DISKS}}"
 MINIO_OPTS="--console-address :9001"
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin
+MINIO_ROOT_USER=${MINIO_ADMIN_USER}
+MINIO_ROOT_PASSWORD=${MINIO_ADMIN_PASSWORD}
 MINIO_SERVER_URL="http://localhost:9000"
 _end_of_text
 
@@ -208,6 +208,15 @@ _end_of_text
 	for((i=0;i<$NUMBER_OF_NODES; i++))
 	do
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo systemctl start minio.service"
+	vmcounter=$(( $vmcounter + 1 ))
+	done
+
+	# Now we go back and set up "mc" for testing
+	echo 'Setup mc on each computer with local for testing'
+	vmcounter=$NAME_SUFFIX_START_NUMBER
+	for((i=0;i<$NUMBER_OF_NODES; i++))
+	do
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="mc alias set local http://localhost:9000 ${MINIO_ADMIN_USER} ${MINIO_ADMIN_PASSWORD}"
 	vmcounter=$(( $vmcounter + 1 ))
 	done
 }
