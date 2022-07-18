@@ -194,6 +194,13 @@ _end_of_text
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo dpkg -i minio.deb"
     gcloud compute scp minio "$NAME_PREFIX"-"$vmcounter":~/minio
 	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mv ~/minio /etc/default/minio"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="curl https://dl.min.io/client/mc/release/linux-amd64/mc -o mc"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="chmod +x mc"
+	gcloud compute ssh "$NAME_PREFIX"-"$vmcounter" --command="sudo mv ~/mc /usr/local/bin/"
+
+
+	vmcounter=$(( $vmcounter + 1 ))
+	done
 
 	vmcounter=$(( $vmcounter + 1 ))
 	done
