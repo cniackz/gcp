@@ -46,6 +46,8 @@ else
 fi
 echo "SERVICE_ACCOUNT: $SERVICE_ACCOUNT"
 
+MINIO_ADMIN_USER=minioadmin
+MINIO_ADMIN_PASSWORD=minioadmin
 TEST_NETWORK=test-network
 TEST_SUBNET=test-subnetwork
 REGION=us-south1
