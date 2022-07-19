@@ -71,7 +71,10 @@ echo "NUMBER_OF_NODES: $NUMBER_OF_NODES"
 echo "How many disks do you need to test with?:"
 read NUMBER_OF_DISKS
 echo "NUMBER_OF_DISKS: $NUMBER_OF_DISKS"
-MACHINE_TYPE=e2-standard-4 
+echo "Please select a machine type from list below:"
+gcloud compute machine-types list --project=$PROJECT_ID --filter=zone=$ZONE | awk '{ print $1 }'
+read MACHINE_TYPE
+echo "MACHINE_TYPE: ${MACHINE_TYPE}"
 TAG_KEY=test
 ETC_HOSTS=
 KEY_PAIRS=TESTING
