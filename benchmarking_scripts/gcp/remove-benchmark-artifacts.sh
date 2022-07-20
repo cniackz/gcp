@@ -7,7 +7,13 @@
 #
 
 source common.sh
+source test-configuration.sh
+
 
 delete_instances
 
 delete_disks
+
+remove_project_filewall_rules
+
+remove_test_network
