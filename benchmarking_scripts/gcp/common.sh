@@ -168,7 +168,7 @@ function create_instances() {
 		--zone=${ZONE} \
 		--size=${DISK_SIZE} \
 		--type=pd-extreme \
-		--provisioned-iops=100000 \
+		--provisioned-iops=${PROVISIONED_IOPS} \
 		-q 
 		#--verbosity=critical
 
